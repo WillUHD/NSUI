@@ -15,7 +15,7 @@ Use a modern, and fluent API.
 ```java
 
 void main() {
-NSWindow.builder("some title")
+    NSWindow.builder("some title")
         .styleMask(
                 StyleMask.titled,
                 StyleMask.miniaturizable,
