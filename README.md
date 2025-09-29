@@ -4,7 +4,7 @@
 
 Make beautiful, native windows like this.
 
-<img width="1161" height="662" alt="image" src="https://github.com/user-attachments/assets/a16728da-1b36-430a-bc22-fb1fe6cedfd5" />
+<img width="1108" height="662" alt="image" src="https://github.com/user-attachments/assets/dc1a350c-9550-42ef-9b39-e2cff0e39e7c" />
 
 <div align="left">
 
@@ -14,14 +14,16 @@ Use a modern, and fluent API.
 
 ```java
 
+void main() {
 NSWindow.builder("some title")
         .styleMask(
                 StyleMask.titled,
                 StyleMask.miniaturizable,
                 StyleMask.resizable,
-                StyleMask.fullSizeContentView
+                StyleMask.fullSizeContentView,
+                StyleMask.nonActivatingPanel
         )
-        .material(Materials.sideBar)
+        .material(Materials.light)
         .titleProperties(props -> props
                 .setTransparency(true)
                 .setTitle("changing a title after it's assigned ")
@@ -36,6 +38,7 @@ NSWindow.builder("some title")
         )
         .build()
         .activate();
+}
 
 ```
 
