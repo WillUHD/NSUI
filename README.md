@@ -43,6 +43,8 @@ NSWindow.builder("some title")
 
 NSUI uses Panama's FFM API for fast Cocoa window customizing, using an SWT backend and using `shell.view.id` to edit the native window. It's the only UI builder of its class to have such levels of native, AppKit-level customization over a macOS window in Java (bonus: it also doesn't suck).
 
+Going from JNA Platform to FFM, window building is nearly instant compared to 1.5-2s.
+
 # 
 
 > **WillUHD**
