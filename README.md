@@ -2,7 +2,7 @@
 
 # NSUI
 
-Make beautiful, native windows like this.
+Make beautiful, native windows like this in Java.
 
 <img width="1108" height="662" alt="image" src="https://github.com/user-attachments/assets/dc1a350c-9550-42ef-9b39-e2cff0e39e7c" />
 
