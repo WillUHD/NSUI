@@ -41,7 +41,7 @@ NSWindow.builder("some title")
 
 # 
 
-NSUI uses Panama features for fast window building, using an SWT backend and using `shell.view.id` to customize the native window handlers. 
+NSUI uses Panama's FFM API for fast Cocoa window customizing, using an SWT backend and using `shell.view.id` to edit the native window. 
 
 
 > **WillUHD**
