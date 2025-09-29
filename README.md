@@ -15,29 +15,33 @@ Use a modern, and fluent API.
 ```java
 
 void main() {
-    NSWindow.builder("some title")
-        .styleMask(
-                StyleMask.titled,
-                StyleMask.miniaturizable,
-                StyleMask.resizable,
-                StyleMask.fullSizeContentView,
-                StyleMask.nonActivatingPanel
-        )
-        .material(Materials.light)
-        .titleProperties(props -> props
-                .setTransparency(true)
-                .setTitle("changing a title after it's assigned ")
-        )
-        .background(bg -> bg
-                .setMovable(true)
-                .setRetainBlurOnFocusLoss(false)
-        )
-        .trafficLights(lights -> lights
-                .setHidden(TrafficLights.zoom)
-                .setHidden(TrafficLights.close)
-        )
-        .build()
-        .activate();
+
+    // setup window
+    NSWindow nsWindow = NSWindow.builder("some title")
+            .styleMask(
+                    StyleMask.titled,
+                    StyleMask.miniaturizable,
+                    StyleMask.resizable,
+                    StyleMask.fullSizeContentView,
+                    StyleMask.nonActivatingPanel
+            )
+            .material(Materials.light)
+            .titleProperties(props -> props
+                    .setTransparency(true)
+                    .setTitle("changing a title after it's assigned ")
+            )
+            .background(bg -> bg
+                    .setMovable(true)
+                    .setRetainBlurOnFocusLoss(true)
+            )
+            .trafficLights(lights -> lights
+                    .setHidden(TrafficLights.zoom)
+                    .setHidden(TrafficLights.close)
+            )
+            .build();
+    
+    // some point later
+    nsWindow.activate();
 }
 
 ```
