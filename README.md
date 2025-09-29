@@ -48,11 +48,11 @@ void main() {
 
 # 
 
-NSUI uses Panama's FFM API for fast Cocoa window customizing, using an SWT backend and using `shell.view.id` to edit the native window. 
+- NSUI uses SWT and `shell.view.id` as a backend, and leverages the FFM API (Panama) for JIT native window customization. 
 
-It's the only UI builder of its class to have such levels of native, AppKit-level customization over a macOS window in Java (bonus: it also doesn't suck).
+It's the only UI builder of its class to have such levels of native, AppKit-level customization over a macOS window in Java (bonus: the API also doesn't suck).
 
-Going from JNA Platform to FFM, window building is nearly instant compared to 1.5-2s.
+Cold-start times using Panama is approximately 3X faster than a previous version using JNA (0.7s vs 2.2s). 
 
 # 
 
