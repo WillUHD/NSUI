@@ -52,7 +52,7 @@ void main() {
 
 - It's the only UI builder of its class to have such levels of native, AppKit-level customization over a macOS window in Java (bonus: the API also doesn't suck).
 
-- Cold-start times using Panama is approximately 3X faster than a previous version using JNA (0.7s vs 2.2s). 
+- Cold-start times on interpreter using Panama is approximately 3X faster than a previous version using JNA (0.7s vs 2.2s), potentially faster using native-image
 
 - Note: `-XstartOnFirstThread` is a required VM argument due to SWT's limitations.
 
