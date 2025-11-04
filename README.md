@@ -55,6 +55,9 @@ void main() {
 
 - Note: `-XstartOnFirstThread` is a required VM argument due to SWT's limitations.
 
+### Credit
+- Title bar swizzling inspired by [SunnyYoung](https://github.com/sunnyyoung/CocoaWindow)
+
 # 
 
 > **WillUHD**
