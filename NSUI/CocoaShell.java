@@ -1,106 +1,119 @@
 package NSUI;
 
 import org.eclipse.swt.widgets.Shell;
-import java.lang.foreign.*;
+import java.lang.foreign.MemorySegment;
 
 public class CocoaShell {
 
     private final MemorySegment window;
     private final MemorySegment effect;
+    private final MemorySegment shellView;
 
-    public CocoaShell(Shell shell) {
-        var shellView = MemorySegment.ofAddress(shell.view.id);
-        this.window = NSBridge.sendMessage(shellView, "window");
-
+    CocoaShell(Shell shell) {
+        NSUICore.getSelector("init");
+        this.shellView = MemorySegment.ofAddress(shell.view.id);
+        NSUICore.sendMessage(shellView, "setWantsLayer:", true);
+        MemorySegment layer = NSUICore.sendMessage(shellView, "layer");
+        MemorySegment clearNSColor = NSUICore.sendMessage(NSUICore.getClass("NSColor"), "clearColor");
+        MemorySegment clearCGColor = NSUICore.sendMessage(clearNSColor, "CGColor");
+        NSUICore.sendMessage(layer, "setBackgroundColor:", clearCGColor);
+        NSUICore.sendMessage(shellView, "setOpaque:", false);
+        this.window = NSUICore.sendMessage(shellView, "window");
         var bounds = shell.getClientArea();
-        var frame = new NSBridge.CGRectRecord(0, 0, bounds.width, bounds.height);
-
-        var effectViewClass = NSBridge.getClass("NSVisualEffectView");
-        var effectView = NSBridge.sendMessage(effectViewClass, "alloc");
-        this.effect = NSBridge.sendMessage(effectView, "initWithFrame:", frame);
+        var frame = new NSUICore.CGRectRecord(0, 0, bounds.width, bounds.height);
+        var effectViewClass = NSUICore.getClass("NSVisualEffectView");
+        var effectView = NSUICore.sendMessage(effectViewClass, "alloc");
+        this.effect = NSUICore.sendMessageInitWithFrame(effectView, "initWithFrame:", frame);
+        long mask = 1L << 1 | 1L << 4;
+        NSUICore.sendMessage(this.effect, "setAutoresizingMask:", mask);
+        NSUICore.sendMessage(this.effect, "setBlendingMode:", 2L);
+        NSUICore.sendMessage(this.effect, "setState:", 1L);
+        NSUICore.sendMessage(this.effect, "setMaskImage:", MemorySegment.NULL);
     }
 
-    public MemorySegment getStandardWindowButton(NSWindow.TrafficLights light) {
-        return NSBridge.sendMessageRetPtr(window, "standardWindowButton:", light.getValue());
+    private MemorySegment getThemeFrame() {
+        MemorySegment contentView = NSUICore.sendMessage(window, "contentView");
+        return NSUICore.sendMessage(contentView, "superview");
     }
 
-    public CocoaShell setStyleMask(NSWindow.StyleMask... m) {
+    MemorySegment getStandardWindowButton(NSWindow.TrafficLights light) {
+        return NSUICore.sendMessageRetPtr(window, "standardWindowButton:", light.getValue());
+    }
+
+    CocoaShell setStyleMask(NSWindow.StyleMask... m) {
         var combinedMask = 0;
         for (var v : m) combinedMask |= v.getValue();
-        NSBridge.sendMessage(window, "setStyleMask:", (long) combinedMask);
+        NSUICore.sendMessage(window, "setStyleMask:", (long) combinedMask);
         return this;
     }
 
-    public CocoaShell setTitlebarAppearsTransparent(boolean isTransparent) {
-        NSBridge.sendMessage(window, "setTitlebarAppearsTransparent:", isTransparent);
+    CocoaShell setTitlebarAppearsTransparent(boolean isTransparent) {
+        NSUICore.sendMessage(window, "setTitlebarAppearsTransparent:", isTransparent);
         return this;
     }
 
-    public CocoaShell setTitleVisibility(boolean isVisible) {
-        NSBridge.sendMessage(window, "setTitleVisibility:", isVisible ? 0L : 1L);
+    CocoaShell setTitleVisibility(boolean isVisible) {
+        NSUICore.sendMessage(window, "setTitleVisibility:", isVisible ? 0L : 1L);
         return this;
     }
 
-    public CocoaShell setTitle(String title) {
-        var nsTitle = NSBridge.createNSString(title);
-        NSBridge.sendMessage(window, "setTitle:", nsTitle);
+    CocoaShell setTitle(String title) {
+        NSUICore.sendMessage(window, "setTitle:", NSUICore.createNSString(title));
         return this;
     }
 
-    public CocoaShell setMovableByWindowBackground(boolean isMovable) {
-        NSBridge.sendMessage(window, "setMovableByWindowBackground:", isMovable);
+    CocoaShell setMovableByWindowBackground(boolean isMovable) {
+        NSUICore.sendMessage(window, "setMovableByWindowBackground:", isMovable);
         return this;
     }
 
-    public CocoaShell setHasShadow(boolean hasShadow) {
-        NSBridge.sendMessage(window, "setHasShadow:", hasShadow);
+    CocoaShell setMaterial(NSWindow.Materials m) {
+        NSUICore.sendMessage(effect, "setMaterial:", m.getValue());
         return this;
     }
 
-    public CocoaShell setAlpha(double alpha) {
-        NSBridge.sendMessage(window, "setAlphaValue:", alpha);
+    CocoaShell setBlurAmount(double blur) {
+        int cid = NSUICore.getMainConnectionID();
+        int wid = (int) NSUICore.sendMessageRetLong(window, "windowNumber");
+        NSUICore.setWindowBackgroundBlurRadius(cid, wid, (long) blur);
         return this;
     }
 
-    public CocoaShell removeBorderEtch() {
-        var clearColor = NSBridge.sendMessage(NSBridge.getClass("NSColor"), "clearColor");
-        NSBridge.sendMessage(window, "setBackgroundColor:", clearColor);
+    CocoaShell setTitlebarHeight(double height) {
+        MemorySegment themeFrame = getThemeFrame();
+        MemorySegment number = NSUICore.createNSNumber(height);
+        NSUICore.setAssociatedObject(themeFrame, NSUICore.titlebarHeight, number);
+        NSUICore.sendVoidMessage(themeFrame, "_resetTitleBarButtons");
         return this;
     }
 
-    public CocoaShell setMaterial(NSWindow.Materials m) {
-        NSBridge.sendMessage(effect, "setMaterial:", m.getValue());
+    CocoaShell setTrafficLightsOffset(NSUICore.CGPointRecord offset) {
+        MemorySegment themeFrame = getThemeFrame();
+        MemorySegment number = NSUICore.createNSNumber(offset.x());
+        NSUICore.setAssociatedObject(themeFrame, NSUICore.redTrafficOffset, number);
+        NSUICore.sendVoidMessage(themeFrame, "_resetTitleBarButtons");
         return this;
     }
 
-    public CocoaShell setLevel(NSWindow.WindowLevel l) {
-        NSBridge.sendMessage(window, "setLevel:", l.getValue());
+    CocoaShell setAppearance(NSWindow.Appearance appearance) {
+        MemorySegment nsAppearanceClass = NSUICore.getClass("NSAppearance");
+        MemorySegment appearanceName = NSUICore.createNSString(appearance.getName());
+        MemorySegment appearanceObject = NSUICore.sendMessageRetPtr(nsAppearanceClass, "appearanceNamed:", appearanceName);
+        NSUICore.sendMessage(window, "setAppearance:", appearanceObject);
+
+        MemorySegment themeFrame = getThemeFrame();
+        NSUICore.sendMessage(themeFrame, "setNeedsDisplay:", true);
         return this;
     }
 
-    public CocoaShell retainBlurOnFocusLoss(boolean retain) {
-        NSBridge.sendMessage(effect, "setState:", retain ? 1L : 0L);
-        return this;
-    }
-
-    public CocoaShell setTabbingMode(NSWindow.TabbingMode m) {
-        NSBridge.sendMessage(window, "setTabbingMode:", m.getValue());
-        return this;
-    }
-
-    public CocoaShell setAutoresizingMask(NSWindow.ResizingMask... m) {
-        var combinedMask = 0;
-        for (var v : m) combinedMask |= v.getValue();
-        NSBridge.sendMessage(effect, "setAutoresizingMask:", combinedMask);
-        return this;
-    }
-
-    public void apply() {
-        var contentView = NSBridge.sendMessage(window, "contentView");
-        NSBridge.sendMessage(contentView, "addSubview:positioned:relativeTo:",
-                this.effect,
-                -1L,
-                MemorySegment.NULL
-        );
+    void apply() {
+        NSUICore.sendMessage(window, "setOpaque:", false);
+        NSUICore.sendMessage(window, "setBackgroundColor:", NSUICore.getClearColor());
+        NSUICore.sendMessage(window, "setContentView:", effect);
+        NSUICore.sendMessage(effect, "addSubview:", shellView);
+        var effectFrame = NSUICore.getFrame(effect);
+        NSUICore.sendMessageSetFrame(shellView, "setFrame:", effectFrame);
+        long mask = 1L << 1 | 1L << 4;
+        NSUICore.sendMessage(shellView, "setAutoresizingMask:", mask);
     }
 }
