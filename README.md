@@ -32,7 +32,6 @@ void main() {
             )
             .background(bg -> bg
                     .setMovable(true)
-                    .setRetainBlurOnFocusLoss(true)
             )
             .trafficLights(lights -> lights
                     .setHidden(TrafficLights.zoom)
